@@ -3,7 +3,7 @@
 ######By: *[Leader], [Member1], [Member2], [Member3]*
 Check out our website: [Group Name Website](https://www.google.com "Google's Homepage!")
 
-![alt text](teamLogo_1.png)
+![alt text](teamLogo_1.jpg)
 
 ###B1: Navigation and Animation
 1. I am a fun project!
