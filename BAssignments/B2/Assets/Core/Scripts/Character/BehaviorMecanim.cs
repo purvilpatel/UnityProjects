@@ -50,6 +50,13 @@ public class BehaviorMecanim : MonoBehaviour
             () => this.Character.NavStop());
     }
 
+    public Node Node_Fight(GameObject fightee)
+    {
+        return new LeafInvoke(
+            () => this.Character.Fight(fightee.transform.position + new Vector3(0, 2, 0)),
+            () => { }
+        );
+    }
     //public Node Node_GoAlongPoints(Val<Vector3>[] targ)
     //{
     //    return new LeafInvoke(

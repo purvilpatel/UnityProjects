@@ -64,6 +64,17 @@ public class CharacterMecanim : MonoBehaviour
         Vector3 offset = delta.normalized * distance;
         return this.NavGoTo(target - offset);
     }
+
+    public virtual RunStatus Fight(Vector3 target)
+    {
+        if (this.Body.IsPunchComplete())
+        {
+            this.Body.ResetPunch();
+            return RunStatus.Success;
+        }
+        this.Body.Punch(target);
+        return RunStatus.Running;
+    }
     #endregion
 
     #region Navigation Commands

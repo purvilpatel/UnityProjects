@@ -92,6 +92,26 @@ public class BodyMecanim : MonoBehaviour
         }
     }
 
+    public bool IsPunchComplete()
+    {
+        return this.ik.IsPunchComplete();
+    }
+
+    public bool IsPunching()
+    {
+        return this.ik.IsPunching();
+    }
+
+    public void Punch(Vector3 target)
+    {
+        this.ik.Punch(target);
+    }
+
+    public void ResetPunch()
+    {
+        this.ik.ResetPunch();
+    }
+
     private void RegisterWithIK()
     {
         this.ik.InteractionStart += this.OnInteractionStart;

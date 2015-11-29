@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 using RootMotion.FinalIK;
 
-public class IKController : MonoBehaviour 
+public class IKController : MonoBehaviour
 {
     /// <summary>
     /// Controls IK for head look
@@ -64,7 +64,7 @@ public class IKController : MonoBehaviour
         {
             this.lookAt.solver.IKPositionWeight =
                 this.weightInterp.Value;
-            this.lookAt.solver.IKPosition = 
+            this.lookAt.solver.IKPosition =
                 this.targetInterp.Value;
             this.lookAt.solver.bodyWeight =
                 this.controlInterp.Value;
@@ -159,15 +159,19 @@ public class IKController : MonoBehaviour
             this.secondaryEffectors =
                 new Dictionary<FullBodyBipedEffector, InteractionObject>();
 
-            this.ikPrimary = iks[0];
-            this.ikSecondary = iks[1];
-            this.SwapTime = swapTime;
+            if (iks.Length>=2)
+            {
+                this.ikPrimary = iks[0];
+                this.ikSecondary = iks[1];
+                this.SwapTime = swapTime;
 
-            this.handlerPrimary = new CrossfadeInteractionHandler(ikPrimary);
-            this.handlerSecondary = new CrossfadeInteractionHandler(ikSecondary);
+                this.handlerPrimary = new CrossfadeInteractionHandler(ikPrimary);
+                this.handlerSecondary = new CrossfadeInteractionHandler(ikSecondary);
 
-            this.RegisterWithHandler(this.handlerPrimary);
-            this.RegisterWithHandler(this.handlerSecondary);
+                this.RegisterWithHandler(this.handlerPrimary);
+                this.RegisterWithHandler(this.handlerSecondary);
+            }
+                  
 
             this.state = BodyIKState.Offline;
         }
@@ -386,6 +390,66 @@ public class IKController : MonoBehaviour
         #endregion
     }
 
+    private class PunchIKController
+    {
+        private CrossfadeFBBIK ikPrimary = null;
+        private CrossfadeFBBIK ikSecondary = null;
+        private Interpolator<float> weightInterp;
+        private bool active = false;
+        private bool forward = true;
+        private bool complete = false;
+        public PunchIKController(CrossfadeFBBIK[] iks)
+        {
+            ikPrimary = iks[0];
+            ikSecondary = iks[1];
+            weightInterp = new Interpolator<float>(
+                0.0f, .5f, Mathf.Lerp);
+        }
+        public void StartPunch(Vector3 target)
+        {
+            weightInterp.ToMax(.25f);
+            ikSecondary.solver.leftHandEffector.position = target;
+            active = true;
+            forward = true;
+            complete = false;
+        }
+        public void Update()
+        {
+            if (active)
+            {
+                ikSecondary.solver.leftHandEffector.positionWeight = weightInterp.Value;
+                if (forward && weightInterp.State == InterpolationState.Max)
+                {
+                    forward = false;
+                    weightInterp.ToMin(.25f);
+                }
+                else if (!forward && weightInterp.State == InterpolationState.Min)
+                {
+                    active = false;
+                    complete = true;
+                }
+            }
+        }
+        public void StopPunch()
+        {
+            active = true;
+            forward = false;
+        }
+        public bool IsPunching()
+        {
+            return active;
+        }
+        public bool IsComplete()
+        {
+            return complete;
+        }
+        public void Reset()
+        {
+            complete = false;
+            active = false;
+        }
+    }
+
     /// <summary>
     /// Called when an InteractionEvent has been started
     /// </summary>
@@ -427,6 +491,8 @@ public class IKController : MonoBehaviour
 
     private LookAtIKController lookController;
     private BodyIKController bodyController;
+    private PunchIKController punchController;
+    private bool isCrab = false;
 
     void Awake()
     {
@@ -437,6 +503,10 @@ public class IKController : MonoBehaviour
         this.bodyController = new BodyIKController(
             this.GetComponents<CrossfadeFBBIK>(),
             this.DefaultDelay);
+        this.punchController = new PunchIKController(
+            this.GetComponents<CrossfadeFBBIK>()
+        );
+
         this.RegisterWithBodyController();
     }
 
@@ -444,6 +514,13 @@ public class IKController : MonoBehaviour
     {
         this.bodyController.Update();
         this.lookController.Update();
+        this.punchController.Update();
+        if (isCrab)
+        {
+            CrossfadeFBBIK ik = this.GetComponents<CrossfadeFBBIK>()[0];
+            ik.solver.bodyEffector.position = transform.position + new Vector3(0, 0, 0);
+            ik.solver.bodyEffector.positionWeight = .5f;
+        }
 
         if (this.bodyController.State == BodyIKState.Offline
             && this.lookController.IsFullBody() == false)
@@ -454,6 +531,35 @@ public class IKController : MonoBehaviour
     {
         this.bodyController.LateUpdate();
         this.lookController.LateUpdate();
+    }
+
+    public void Punch(Vector3 target)
+    {
+        if (!this.punchController.IsPunching())
+        {
+            this.punchController.StartPunch(target);
+        }
+        Debug.Log("Punching");
+    }
+
+    public bool IsPunching()
+    {
+        return this.punchController.IsPunching();
+    }
+
+    public bool IsPunchComplete()
+    {
+        return this.punchController.IsComplete();
+    }
+
+    public void ResetPunch()
+    {
+        this.punchController.Reset();
+    }
+
+    public void BecomeCrab()
+    {
+        isCrab = true;
     }
 
     public void LookAt(Vector3 target, float delay)
@@ -477,7 +583,7 @@ public class IKController : MonoBehaviour
     }
 
     public void StartInteraction(
-        FullBodyBipedEffector effector, 
+        FullBodyBipedEffector effector,
         InteractionObject obj)
     {
         this.bodyController.StartInteraction(effector, obj);
