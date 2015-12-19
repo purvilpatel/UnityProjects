@@ -37,7 +37,52 @@ Scalable to Agents – Our street fighters and soldier is prefab and all the str
 Non Linear characteristic – Our fighters chooses different fight moves randomly.
 
 
-###B4: Interactive Narrative Game
-1. I am a real project!
-2. Features
-3. Description
+###B3: Interactive Narrative Game
+Part 1:
+
+We have shown the behavior tree in above figures for the story of our interactive narrative.
+
+In part 1, Multiple street fighters are fighting each other in an environment and there is a soldier inside warehouse.
+
+Soldier comes out of the warehouse by opening the door. We have used inverse kinematics for implementing this.
+
+As soon as the fighters see the soldier, they start running for their lives and soldier starts following any one of the fighters randomly. (non-linearity)
+
+Fighters chooses fighting moves randomly from Kick or Punch and they try to dodge when other fighter tries to hit them.
+
+
+Part 2:
+
+In this Part we have given user the control of soldier.
+User can control soldier through Keyboard. 
+
+Walk: Arrow Keys
+Jump: Space
+Shift: Run
+
+The story remains the same as Part 1 and has similar flow of behavior tree.
+
+-	How, user can impact on flow of story?
+
+User can choose when to enter the field by opening the door. So, Fighters will start running only when user opens the door and is visible to fighters.
+
+Part 3:
+
+In this part, user can choose to be either a fighter or a soldier.
+Story works perfectly for both fighter and soldier.
+
+User can control soldier and fighter through keyboard.
+
+Soldier control
+
+Walk: Arrow Keys
+Jump: Space
+Shift: Run	Fighter Control
+
+Fighter Control
+
+Run and Turn: Arrow Keys
+Shift: Fight
+
+
+
