@@ -1,6 +1,7 @@
 #Team Panther
 ######Unity Projects - CG Fall 2015 @ Rutgers
 ######By: *[Purvil Patel], [Parth Shah], [Rajan Patel], [Harshil patel]*
+
 Check out our website: [Team Panther Blog](https://infopurvil.wordpress.com/teampanther/ "Team Panther page")
 
 ![alt text](teamLogo_1.jpg)
